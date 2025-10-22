@@ -1,0 +1,60 @@
+stages:
+  - deploy
+
+variables:
+  DEPLOY_PATH_TEST_SERVER: "/opt/websoft/docker/WebSoftServerForDocker/"
+  DEPLOY_PATH_PROD_SERVER: "/opt/websoft/docker/WebSoftServerForDocker/"
+  REPOSITORY_URL: "cld-inf-git01d.lancetpharm.ru/a.kravchenko/websofthcm.git"
+
+.deploy_template: &deploy_template
+  stage: deploy
+  script:
+    - |
+      # Динамическое определение DEPLOY_PATH в зависимости от ветки
+      if [ "$CI_COMMIT_BRANCH" = "test" ]; then
+        DEPLOY_PATH="$DEPLOY_PATH_TEST_SERVER"
+        SERVER_TYPE="Test"
+      elif [ "$CI_COMMIT_BRANCH" = "prod" ]; then
+        DEPLOY_PATH="$DEPLOY_PATH_PROD_SERVER"
+        SERVER_TYPE="Production"
+      else
+        echo "Error: Unknown branch $CI_COMMIT_BRANCH"
+        exit 1
+      fi
+      
+      # Формирование полного URL репозитория с токеном
+      FULL_REPOSITORY_URL="https://gitlab-ci-token:${CI_JOB_TOKEN}@${REPOSITORY_URL}"
+      
+      echo "$CI_PROJECT_NAME Deploying to $SERVER_TYPE server (branch: $CI_COMMIT_BRANCH)..."
+      echo "Using DEPLOY_PATH: $DEPLOY_PATH"
+      
+      if [ ! -d ".git" ]; then
+        echo "Cloning repository using CI_JOB_TOKEN..."
+        git clone "$FULL_REPOSITORY_URL" .
+      else
+        git remote set-url origin "$FULL_REPOSITORY_URL"
+        git fetch origin
+        git checkout "$CI_COMMIT_BRANCH"
+        git pull origin "$CI_COMMIT_BRANCH"
+      fi
+      
+      echo "Copying updated files to $DEPLOY_PATH"
+      rsync -av --progress --update --exclude='.git/' --exclude='*.yml' --exclude='*.md' ./ "$DEPLOY_PATH/" --no-times --no-group --no-owner --no-perms
+  after_script:
+    - echo "$SERVER_TYPE deployment completed successfully"
+
+# Деплой на тестовый сервер
+deploy_test:
+  <<: *deploy_template
+  tags:
+    - test
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "test"'
+
+# Деплой на продакшен сервер
+deploy_prod:
+  <<: *deploy_template
+  tags:
+    - prod
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "prod"'
