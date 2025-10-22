@@ -16,7 +16,7 @@
 ### Настроить папки с которыми вы будете работать
 - На примере папки libs - cкопировать папку libs из образа websoft HCM на сервер в директорию (к примеру):
 /opt/websoft/docker/WebSoftServerForDocker/wtv/libs<br>
-- Настроить bind mount в Docker при запуске контейнера:<br>
+- Настроить bind mount на эту папку в Docker при запуске контейнера:<br>
 "-v /opt/websoft/docker/WebSoftServerForDocker/wtv/libs:/WebsoftServer/wtv/libs"
 
 ### Архитектура пайплайна
