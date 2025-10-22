@@ -13,6 +13,12 @@
 - Git - для работы с репозиторием (клонирование, обновление кода)
 - rsync - для эффективного копирования файлов (обычно предустановлен в Linux)
 
+### Настроить папки с которыми вы будете работать
+На примере папки libs - cкопировать папку libs из образа websoft HCM на сервер в директорию (к примеру):
+/opt/websoft/docker/WebSoftServerForDocker/wtv/libs
+Настроить bind mount в Docker при запуске контейнера:
+-v /opt/websoft/docker/WebSoftServerForDocker/wtv/libs:/WebsoftServer/wtv/libs
+
 ### Архитектура пайплайна
 
 GitLab Repository
