@@ -4,7 +4,7 @@ stages:
 variables:
   DEPLOY_PATH_TEST_SERVER: "/opt/websoft/docker/WebSoftServerForDocker/"
   DEPLOY_PATH_PROD_SERVER: "/opt/websoft/docker/WebSoftServerForDocker/"
-  REPOSITORY_URL: "cld-inf-git01d.lancetpharm.ru/a.kravchenko/websofthcm.git"
+  REPOSITORY_URL: "gitlab.you-server.ru/websofthcm.git"
 
 .deploy_template: &deploy_template
   stage: deploy
